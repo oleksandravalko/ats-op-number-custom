@@ -1,5 +1,5 @@
 import { Actor } from 'apify';
-import { Dataset, log, PlaywrightCrawler, sleep } from 'crawlee';
+import { Dataset, PlaywrightCrawler } from 'crawlee';
 
 interface Input {
     startUrls: string[];
