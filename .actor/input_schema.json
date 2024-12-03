@@ -1,0 +1,39 @@
+{
+    "title": "PlaywrightCrawler Template",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "startUrls": {
+            "title": "Start URLs",
+            "type": "array",
+            "description": "URLs to start with.",
+            "editor": "requestListSources",
+            "prefill": [
+                {
+                    "url": "https://recruiting.ultipro.com/EAS1008/JobBoard/ef91672a-cf30-dbb2-08ae-03350ce00008/?q=&o=postedDateDesc&w=&wc=&we=&wpst="
+                },
+                {
+                    "url": "https://recruiting.ultipro.com/BUT1000BUTH/JobBoard/8647bdd0-d14e-4f0c-8971-3a34b934ba86/?q=&o=postedDateDesc&w=&wc=&we=&wpst="
+                },
+                {
+                    "url": "https://bawc.com/apply/"
+                },
+                {
+                    "url": "https://careers.joveo.com/search-jobs/?keyword="
+                },
+                {
+                    "url": "https://epitec.com/search-jobs/?query=&zip=&radius="
+                },
+                {
+                    "url": "https://jobs.jobvite.com/glidewelldental/%3Fnl=1&fr=true"
+                }
+            ]
+        },
+        "maxRequestsPerCrawl": {
+            "title": "Max Requests per Crawl",
+            "type": "integer",
+            "description": "Maximum number of requests that can be made by this crawler.",
+            "default": 100
+        }
+    }
+}
