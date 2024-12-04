@@ -1,5 +1,5 @@
 import { Actor } from 'apify';
-import { Dataset, PlaywrightCrawler } from 'crawlee';
+import { Dataset, PlaywrightCrawler, sleep } from 'crawlee';
 
 interface Input {
     startUrls: string[];
@@ -14,18 +14,21 @@ const {
 } = await Actor.getInput<Input>() ?? {} as Input;
 
 const proxyConfiguration = await Actor.createProxyConfiguration({
-    groups: ['RESIDENTIAL'],
-    countryCode: 'US',
+    // groups: ['RESIDENTIAL'],
+    // countryCode: 'US',
 });
 
 const crawler = new PlaywrightCrawler({
     maxRequestsPerCrawl,
     proxyConfiguration,
     headless: false,
+    navigationTimeoutSecs: 20,
+    requestHandlerTimeoutSecs: 999999,
     requestHandler: async ({ page, request }) => {
         const { url } = request;
         let number = null;
         if (url.includes('recruiting.ultipro.com')) {
+            await sleep(10_000);
             const foundNumber = await page.evaluate(() => {
                 return document.querySelector('[data-automation="opportunities-count"]')?.innerHTML.split('of')[1].replace(/[^0-9.]/g, '');
             });
