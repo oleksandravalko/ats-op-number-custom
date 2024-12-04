@@ -10,22 +10,19 @@
             "editor": "requestListSources",
             "prefill": [
                 {
-                    "url": "https://recruiting.ultipro.com/EAS1008/JobBoard/ef91672a-cf30-dbb2-08ae-03350ce00008/?q=&o=postedDateDesc&w=&wc=&we=&wpst="
+                    "url": "https://jobs.burnettspecialists.com/"
                 },
                 {
-                    "url": "https://recruiting.ultipro.com/BUT1000BUTH/JobBoard/8647bdd0-d14e-4f0c-8971-3a34b934ba86/?q=&o=postedDateDesc&w=&wc=&we=&wpst="
+                    "url": "https://m-v-t.com/cdl-jobs/?utm_source=m-v-t.com&utm_medium=m-v-t.com&utm_campaign=m-v-t.com+home+page&utm_id=m-v-t.com"
                 },
                 {
-                    "url": "https://bawc.com/apply/"
+                    "url": "https://jobs.yorkemployment.com/"
                 },
                 {
                     "url": "https://careers.joveo.com/search-jobs/?keyword="
                 },
                 {
                     "url": "https://epitec.com/search-jobs/?query=&zip=&radius="
-                },
-                {
-                    "url": "https://jobs.jobvite.com/glidewelldental/%3Fnl=1&fr=true"
                 }
             ]
         },
