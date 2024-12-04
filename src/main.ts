@@ -24,6 +24,9 @@ const crawler = new PlaywrightCrawler({
     headless: false,
     navigationTimeoutSecs: 20,
     requestHandlerTimeoutSecs: 999999,
+    preNavigationHooks: [async (_, gotoOptions) => {
+        gotoOptions!.waitUntil = 'networkidle';
+    }],
     requestHandler: async ({ page, request }) => {
         const { url } = request;
         let number = null;
