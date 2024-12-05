@@ -66,6 +66,7 @@ const crawler = new PlaywrightCrawler({
         }
 
         if (url.includes('m-v-t.com')) {
+            await page.waitForSelector('.job_listing', { timeout: 60_000 });
             await clickOnLoadMoreButtonWhilePresent(page, '.load_more_jobs');
             await sleep(2_000);
             number = await getNumberBySelectorCount(page, '.job_listing');
