@@ -1,5 +1,6 @@
 import { Page } from 'playwright';
-import { sleep } from 'crawlee';
+import { Dataset, PlaywrightCrawler, sleep } from 'crawlee';
+import { REQUEST_LABELS } from './contstants.js';
 
 export const getNumberFromMixedString = async (page: Page, selector: string): Promise<number> => {
     const onlyNumericalValue = await page.evaluate((selector) => document.querySelector(selector)?.innerHTML.replace(/[^0-9.]/g, ''), selector);
@@ -34,4 +35,16 @@ export const clickOnLoadMoreButtonWhilePresent = async (page:Page, buttonSelecto
             //
         }
     }
+};
+
+export const getNextPageUrlFromSelector = async (page:Page, selector:string) => {
+    return await page.evaluate((selector) => document.querySelector(selector)?.getAttribute('href'), selector);
+};
+
+export const pushToDataset = async (url: string, number:number, method:string) => {
+    await Dataset.pushData({
+        url,
+        number,
+        method,
+    });
 };
