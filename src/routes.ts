@@ -1,13 +1,13 @@
 import { createPlaywrightRouter, Dataset, log, sleep } from 'crawlee';
 import { REQUEST_LABELS } from './contstants.js';
 import {
-    clickOnLoadMoreButtonWhilePresent,
+    clickOnLoadMoreButtonWhilePresent, getJobsCountByCrawlingThroughConsequentPages,
     getNextPageUrlFromSelector,
     getNumberBySelectorCount,
     getNumberFromMixedString, pushToDataset,
     scrollToTheBottom,
 } from './utils.js';
-import { NextPageRequest } from './types.js';
+import { NextPageCrawlingData, NextPageRequest } from './types.js';
 
 export const router = createPlaywrightRouter();
 
@@ -36,34 +36,17 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     }
 
     if (url.includes('epitec.com')) {
-        const positionSelector = '.job-listings__job';
-        const nextButtonSelector = '.archive-pagination__next a';
-        const domain = 'epitec.com';
+        number = await getJobsCountByCrawlingThroughConsequentPages(
+            page,
+            {
+                domain: 'epitec.com',
+                startUrl: url,
+                positionSelector: '.job-listings__job',
+                nextButtonSelector: '.archive-pagination__next a',
+            },
+            crawler);
 
-        const jobsCountOnFirstPage = await getNumberBySelectorCount(page, positionSelector);
-
-        const hrefOfNextPageButton = await getNextPageUrlFromSelector(page, nextButtonSelector);
-
-        if (hrefOfNextPageButton) {
-            const nextPageUrl = `https://${domain}${hrefOfNextPageButton}`;
-
-            const nextPageRequest:NextPageRequest = {
-                url: nextPageUrl,
-                label: REQUEST_LABELS.NEXT,
-                userData: {
-                    domain,
-                    startUrl: url,
-                    jobsCount: jobsCountOnFirstPage,
-                    positionSelector,
-                    nextButtonSelector,
-                },
-            };
-
-            await crawler.addRequests([nextPageRequest]);
-            return;
-        }
-
-        await pushToDataset(url, jobsCountOnFirstPage, 'Crawled through consequent pages counting positions.');
+        if (number) await pushToDataset(url, number, 'Crawled through consequent pages counting positions.');
     }
 
     if (url.includes('yorkemployment.com') || url.includes('burnettspecialists.com')) {
@@ -90,30 +73,10 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
 });
 
 router.addHandler(REQUEST_LABELS.NEXT, async ({ page, request, crawler }) => {
-    const { domain, startUrl, jobsCount, positionSelector, nextButtonSelector } = request.userData;
-
-    const jobsCountOnCurrentPage = await getNumberBySelectorCount(page, positionSelector);
-    const newJobsCount = jobsCount + jobsCountOnCurrentPage;
-
-    const hrefOfNextPageButton = await getNextPageUrlFromSelector(page, nextButtonSelector);
-    if (hrefOfNextPageButton) {
-        const nextPageUrl = domain ? `https://${domain}${hrefOfNextPageButton}` : hrefOfNextPageButton;
-
-        const nextPageRequest:NextPageRequest = {
-            url: nextPageUrl,
-            label: REQUEST_LABELS.NEXT,
-            userData: {
-                domain,
-                startUrl,
-                jobsCount: newJobsCount,
-                positionSelector,
-                nextButtonSelector,
-            },
-        };
-
-        await crawler.addRequests([nextPageRequest]);
-        return;
-    }
-
-    await pushToDataset(startUrl, newJobsCount, 'Crawled through consequent pages counting positions.');
+    const number = await getJobsCountByCrawlingThroughConsequentPages(
+        page,
+        request.userData as NextPageCrawlingData,
+        crawler,
+    );
+    if (number) await pushToDataset(request.userData.startUrl, number, 'Crawled through consequent pages counting positions.');
 });

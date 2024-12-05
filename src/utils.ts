@@ -1,6 +1,7 @@
 import { Page } from 'playwright';
 import { Dataset, PlaywrightCrawler, sleep } from 'crawlee';
 import { REQUEST_LABELS } from './contstants.js';
+import { NextPageCrawlingData, NextPageRequest } from './types.js';
 
 export const getNumberFromMixedString = async (page: Page, selector: string): Promise<number> => {
     const onlyNumericalValue = await page.evaluate((selector) => document.querySelector(selector)?.innerHTML.replace(/[^0-9.]/g, ''), selector);
@@ -47,4 +48,38 @@ export const pushToDataset = async (url: string, number:number, method:string) =
         number,
         method,
     });
+};
+
+export const getJobsCountByCrawlingThroughConsequentPages = async (page:Page, crawlingData:NextPageCrawlingData, crawler:PlaywrightCrawler) => {
+    const {
+        domain,
+        startUrl,
+        jobsCount,
+        positionSelector,
+        nextButtonSelector,
+    } = crawlingData;
+
+    const jobsCountOnCurrentPage = await getNumberBySelectorCount(page, positionSelector);
+    const newJobsCount = jobsCount ? jobsCount + jobsCountOnCurrentPage : jobsCountOnCurrentPage;
+
+    const hrefOfNextPageButton = await getNextPageUrlFromSelector(page, nextButtonSelector);
+    if (hrefOfNextPageButton) {
+        const nextPageUrl = domain ? `https://${domain}${hrefOfNextPageButton}` : hrefOfNextPageButton;
+
+        const nextPageRequest:NextPageRequest = {
+            url: nextPageUrl,
+            label: REQUEST_LABELS.NEXT,
+            userData: {
+                domain,
+                startUrl,
+                jobsCount: newJobsCount,
+                positionSelector,
+                nextButtonSelector,
+            },
+        };
+
+        await crawler.addRequests([nextPageRequest]);
+        return;
+    }
+    return newJobsCount;
 };

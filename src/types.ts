@@ -15,11 +15,13 @@ export type Request = {
 export type NextPageRequest = {
     url: string;
     label: string;
-    userData: {
-        domain?: string;
-        startUrl: string;
-        jobsCount: number;
-        positionSelector: string;
-        nextButtonSelector: string;
-    };
+    userData: NextPageCrawlingData;
 };
+
+export type NextPageCrawlingData = {
+    domain?: string;
+    startUrl: string;
+    jobsCount?: number;
+    positionSelector: string;
+    nextButtonSelector: string;
+}
