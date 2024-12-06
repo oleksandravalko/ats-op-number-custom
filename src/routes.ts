@@ -1,12 +1,14 @@
-import { createPlaywrightRouter, Dataset, log, RequestQueue, sleep } from 'crawlee';
+import { createPlaywrightRouter, log, sleep } from 'crawlee';
 import { REQUEST_LABELS } from './contstants.js';
 import {
-    clickOnLoadMoreButtonWhilePresent, getJobsCountByCrawlingThroughConsequentPages,
+    clickOnLoadMoreButtonWhilePresent,
+    getJobsCountByCrawlingThroughConsequentPages,
     getNumberBySelectorCount,
-    getNumberFromMixedString, pushToDataset,
+    getNumberFromMixedString,
+    pushToDataset,
     scrollToTheBottom,
 } from './utils.js';
-import { LastPageCrawlingData, LastPageRequest, NextPageCrawlingData } from './types.js';
+import type { LastPageCrawlingData, LastPageRequest, NextPageCrawlingData } from './types.js';
 
 export const router = createPlaywrightRouter();
 
@@ -51,21 +53,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         if (number) await pushToDataset(url, number, 'Crawled through consequent pages counting positions.');
     }
 
-    // if (url.includes('mjrecruiters.com')) {
-    //     number = await getJobsCountByCrawlingThroughConsequentPages(
-    //         page,
-    //         {
-    //             domain,
-    //             startUrl: url,
-    //             positionSelector: '.job-box-cont',
-    //             nextButtonSelector: '.rw-right-btn a',
-    //         },
-    //         crawler);
-    //
-    //     if (number) await pushToDataset(url, number, 'Crawled through consequent pages counting positions.');
-    // } too many pages, needs better way
-
-    if (url.includes('yorkemployment.com') || url.includes('burnettspecialists.com')) {
+    if (/yorkemployment.com/.test(domain) || /burnettspecialists.com/.test(domain) || /selectek.com/.test(domain) || /dwsimpson.com/.test(domain)) {
         await scrollToTheBottom(page);
         number = await getNumberBySelectorCount(page, '.job-post-row');
         method = 'Automated loading of whole list by scrolling, count based on selectors count.';
@@ -78,11 +66,46 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await pushToDataset(url, number, method);
     }
 
+    if (/supplyhouse.com/.test(domain)) {
+        number = await getNumberBySelectorCount(page, '.pos-item');
+        method = 'Based on selectors count.';
+        await pushToDataset(url, number, method);
+    }
+
+    if (/ssemploymentpartners.com/.test(domain)) {
+        await crawler.addRequests([
+            {
+                url: 'https://www2.pcrecruiter.net/pcrbin/jobboard.aspx?uid=ss%20employment%20partners%20.ssemploymentpartners',
+                label: REQUEST_LABELS.ALTERNATIVE,
+                userData: {
+                    startUrl: url,
+                },
+            },
+        ]);
+    }
     if (url.includes('m-v-t.com')) {
         await page.waitForSelector('.job_listing', { timeout: 60_000 });
         await clickOnLoadMoreButtonWhilePresent(page, '.load_more_jobs');
         await sleep(2_000);
         number = await getNumberBySelectorCount(page, '.job_listing');
+        method = 'Automated loading of whole list by button clicks, count based on selectors count.';
+        await pushToDataset(url, number, method);
+    }
+
+    if (/velosource.com/.test(domain)) {
+        await page.waitForSelector('[role="listitem"]', { timeout: 60_000 });
+        await clickOnLoadMoreButtonWhilePresent(page, '[aria-label="Load More"]');
+        await sleep(2_000);
+        number = await getNumberBySelectorCount(page, '[role="listitem"]');
+        method = 'Automated loading of whole list by button clicks, count based on selectors count.';
+        await pushToDataset(url, number, method);
+    }
+
+    if (/careeradvancers.com/.test(domain)) {
+        await page.waitForSelector('.recruiterwp-jobs-col', { timeout: 60_000 });
+        await clickOnLoadMoreButtonWhilePresent(page, '.facetwp-load-more');
+        await sleep(2_000);
+        number = await getNumberBySelectorCount(page, '.job-listing-item');
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
         await pushToDataset(url, number, method);
     }
@@ -133,7 +156,7 @@ router.addHandler(REQUEST_LABELS.NEXT, async ({ page, request, crawler }) => {
     if (number) await pushToDataset(request.userData.startUrl, number, 'Crawled through consequent pages counting positions.');
 });
 
-router.addHandler(REQUEST_LABELS.LAST, async ({ page, request, crawler }) => {
+router.addHandler(REQUEST_LABELS.LAST, async ({ page, request }) => {
     const { url, userData } = request;
     const currentPageNumber = Number(new URL(url).searchParams.get('page'));
     const lastPageNumber = Number(await page.locator(userData.paginationItemSelector).last().getAttribute('title'));
@@ -142,6 +165,20 @@ router.addHandler(REQUEST_LABELS.LAST, async ({ page, request, crawler }) => {
         const jobsCountOnCurrentPage = await getNumberBySelectorCount(page, 'positionSelector');
         const jobsCountOnPreviousPages = userData.maxJobsCountPerPage * (currentPageNumber - 1);
         const number = jobsCountOnCurrentPage + jobsCountOnPreviousPages;
-        if (number) await pushToDataset(request.userData.startUrl, number, 'Crawled through consequent pages counting positions.');
+        if (number) await pushToDataset(userData.startUrl, number, 'Jumped to the last page and calculated jobs.');
     }
+});
+
+router.addHandler(REQUEST_LABELS.ALTERNATIVE, async ({ page, request }) => {
+    const { url, userData } = request;
+    let number = null;
+    if (/ssemploymentpartners/.test(url)) {
+        const foundNumber = await page.evaluate(() => {
+            return document.querySelector('#resultcount')?.innerHTML.split('of')[1].replace(/\s/g, ''); // e.g. "1-12 of 13"
+        });
+
+        number = Number(foundNumber);
+    }
+
+    if (number) await pushToDataset(userData.startUrl, number, 'Got number from alternative page.');
 });

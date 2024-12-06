@@ -21,7 +21,7 @@ const crawler = new PlaywrightCrawler({
     proxyConfiguration,
     headless: false,
     navigationTimeoutSecs: 180,
-    // requestHandlerTimeoutSecs: 999999,
+    requestHandlerTimeoutSecs: 999999,
     preNavigationHooks: [async (_, gotoOptions) => {
         gotoOptions!.waitUntil = 'networkidle';
     }],
