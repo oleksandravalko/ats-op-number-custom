@@ -59,7 +59,7 @@ export const getJobsCountByCrawlingThroughConsequentPages = async (page:Page, cr
         nextButtonSelector,
     } = crawlingData;
 
-    const jobsCountOnCurrentPage = await getNumberBySelectorCount(page, positionSelector);
+    const jobsCountOnCurrentPage = Number(await getNumberBySelectorCount(page, positionSelector));
     const newJobsCount = jobsCount ? jobsCount + jobsCountOnCurrentPage : jobsCountOnCurrentPage;
 
     const hrefOfNextPageButton = await getNextPageUrlFromSelector(page, nextButtonSelector);

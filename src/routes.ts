@@ -39,7 +39,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await pushToDataset(url, jobsCount, method);
     }
 
-    if (url.includes('epitec.com')) {
+    if (/epitec.com/.test(domain)) {
         jobsCount = await getJobsCountByCrawlingThroughConsequentPages(
             page,
             {
@@ -48,9 +48,9 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
                 positionSelector: '.job-listings__job',
                 nextButtonSelector: '.archive-pagination__next a',
             },
-            crawler) || null;
+            crawler);
 
-        await pushToDataset(url, jobsCount, 'Crawled through consequent pages counting positions.');
+        if (typeof jobsCount !== 'undefined') await pushToDataset(url, jobsCount, 'Crawled through consequent pages counting positions.');
     }
 
     if (/yorkemployment.com/.test(domain) || /burnettspecialists.com/.test(domain) || /selectek.com/.test(domain) || /dwsimpson.com/.test(domain)) {
@@ -188,7 +188,7 @@ router.addHandler(REQUEST_LABELS.NEXT, async ({ page, request, crawler }) => {
         page,
         request.userData as NextPageCrawlingData,
         crawler,
-    ) || null;
+    );
     await pushToDataset(request.userData.startUrl, jobsCount, 'Crawled through consequent pages counting positions.');
 });
 
@@ -203,7 +203,7 @@ router.addHandler(REQUEST_LABELS.LAST, async ({ page, request }) => {
         const jobsCountOnPreviousPages = userData.maxJobsCountPerPage * (currentPageNumber - 1);
         jobsCount = jobsCountOnCurrentPage + jobsCountOnPreviousPages;
     }
-    await pushToDataset(userData.startUrl, jobsCount, 'Jumped to the last page and calculated jobs.');
+    if (typeof jobsCount !== 'undefined') await pushToDataset(userData.startUrl, jobsCount, 'Jumped to the last page and calculated jobs.');
 });
 
 router.addHandler(REQUEST_LABELS.ALTERNATIVE, async ({ page, request }) => {
