@@ -40,7 +40,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     }
 
     if (/epitec.com/.test(domain)) {
-        jobsCount = await getJobsCountByCrawlingThroughConsequentPages(
+        const foundNumber = await getJobsCountByCrawlingThroughConsequentPages(
             page,
             {
                 domain,
@@ -50,7 +50,10 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
             },
             crawler);
 
-        if (typeof jobsCount !== 'undefined') await pushToDataset(url, jobsCount, 'Crawled through consequent pages counting positions.');
+        if (!foundNumber) {
+            return;
+        }
+        await pushToDataset(url, foundNumber, 'Crawled through consequent pages counting positions.');
     }
 
     if (/yorkemployment.com/.test(domain) || /burnettspecialists.com/.test(domain) || /selectek.com/.test(domain) || /dwsimpson.com/.test(domain)) {
@@ -189,6 +192,9 @@ router.addHandler(REQUEST_LABELS.NEXT, async ({ page, request, crawler }) => {
         request.userData as NextPageCrawlingData,
         crawler,
     );
+    if (!jobsCount) {
+        return;
+    }
     await pushToDataset(request.userData.startUrl, jobsCount, 'Crawled through consequent pages counting positions.');
 });
 

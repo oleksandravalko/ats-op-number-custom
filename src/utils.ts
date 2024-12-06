@@ -1,7 +1,7 @@
 import { Page } from 'playwright';
 import { Dataset, PlaywrightCrawler, sleep } from 'crawlee';
 import { REQUEST_LABELS } from './contstants.js';
-import { LastPageCrawlingData, LastPageRequest, NextPageCrawlingData, NextPageRequest } from './types.js';
+import { NextPageCrawlingData, NextPageRequest } from './types.js';
 
 export const getNumberFromMixedString = async (page: Page, selector: string): Promise<number> => {
     const onlyNumericalValue = await page.evaluate((selector) => document.querySelector(selector)?.innerHTML.replace(/[^0-9.]/g, ''), selector);
