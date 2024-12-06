@@ -69,7 +69,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     if (/stutsmans.com/.test(domain)) {
         const frameLocator = page.frameLocator('#gnewtonIframe');
         if (await frameLocator.locator('#gnewtonCareerHome').isVisible({ timeout: 120_000 })) {
-            jobsCount = await frameLocator.locator('.jobListItem')?.count();
+            jobsCount = await frameLocator.locator('.gnewtonJobLink')?.count();
             method = 'Based on selectors count.';
         }
         await pushToDataset(url, jobsCount, method);
