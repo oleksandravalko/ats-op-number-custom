@@ -25,3 +25,16 @@ export type NextPageCrawlingData = {
     positionSelector: string;
     nextButtonSelector: string;
 }
+
+export type LastPageRequest = {
+    url: string;
+    label: string;
+    userData: LastPageCrawlingData;
+};
+
+export type LastPageCrawlingData = {
+    startUrl: string,
+    maxJobsCountPerPage: number,
+    positionSelector: '.ant-list-item',
+    paginationItemSelector: '.ant-pagination-item',
+}
