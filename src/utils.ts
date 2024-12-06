@@ -42,7 +42,7 @@ export const getNextPageUrlFromSelector = async (page:Page, selector:string) => 
     return await page.evaluate((selector) => document.querySelector(selector)?.getAttribute('href'), selector);
 };
 
-export const pushToDataset = async (url: string, number:number, method:string) => {
+export const pushToDataset = async (url: string, number:number|null, method:string) => {
     await Dataset.pushData({
         url,
         number,

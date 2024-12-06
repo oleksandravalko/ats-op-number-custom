@@ -10,19 +10,40 @@
             "editor": "requestListSources",
             "prefill": [
                 {
-                    "url": "https://jobs.burnettspecialists.com/"
+                    "url": "https://epitec.com/search-jobs/?query=&zip=&radius=/"
                 },
                 {
-                    "url": "https://m-v-t.com/cdl-jobs/?utm_source=m-v-t.com&utm_medium=m-v-t.com&utm_campaign=m-v-t.com+home+page&utm_id=m-v-t.com"
+                    "url": "https://www.velosource.com/all-jobs"
+                },
+                {
+                    "url": "https://jobs.careeradvancers.com/"
+                },
+                {
+                    "url": "https://www.supplyhouse.com/careers"
+                },
+                {
+                    "url": "https://jobs.selectek.com/"
+                },
+                {
+                    "url": "https://jobs.dwsimpson.com/index.smpl?arg=jb_search_results&view=0"
+                },
+                {
+                    "url": "https://www.ssemploymentpartners.com/"
                 },
                 {
                     "url": "https://jobs.yorkemployment.com/"
                 },
                 {
-                    "url": "https://careers.joveo.com/search-jobs/?keyword="
+                    "url": "https://jobs.burnettspecialists.com/"
                 },
                 {
-                    "url": "https://epitec.com/search-jobs/?query=&zip=&radius="
+                    "url": "https://gtstaffing.com/job-seekers/"
+                },
+                {
+                    "url": "https://www.oppenheimer.com/careers/experienced-hires.aspx"
+                },
+                {
+                    "url": "https://www.talkspace.com/careers#openings"
                 }
             ]
         },
