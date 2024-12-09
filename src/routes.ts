@@ -207,6 +207,11 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Based on selectors count.';
     }
 
+    if (/mgahomecare/.test(domain)) {
+        jobsCount = await page.locator('tr.joblist').count();
+        method = 'Based on selectors count.';
+    }
+
     if (/managedlaborsolutions.prismhr-hire/.test(domain)) {
         jobsCount = await page.locator('.job-container').count();
         method = 'Based on selectors count.';
