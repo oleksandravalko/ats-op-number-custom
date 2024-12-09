@@ -90,6 +90,11 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Based on selectors count.';
     }
 
+    if (/oklahomadepartmentofhumanservices/.test(domain)) {
+        jobsCount = await page.locator('.list-group-item').count();
+        method = 'Based on selectors count.';
+    }
+
     if (/automate.org/.test(domain)) {
         const dropDownLocator = page.locator('#zipSearch #field1_1');
         if (dropDownLocator) {
