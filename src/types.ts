@@ -35,6 +35,6 @@ export type LastPageRequest = {
 export type LastPageCrawlingData = {
     startUrl: string,
     maxJobsCountPerPage: number,
-    positionSelector: '.ant-list-item',
-    paginationItemSelector: '.ant-pagination-item',
+    positionSelector: string
+    paginationItemSelector: string,
 }

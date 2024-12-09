@@ -1,7 +1,7 @@
 import { Page } from 'playwright';
 import { Dataset, PlaywrightCrawler, sleep } from 'crawlee';
 import { REQUEST_LABELS } from './contstants.js';
-import { NextPageCrawlingData, NextPageRequest } from './types.js';
+import { type LastPageCrawlingData, type LastPageRequest, NextPageCrawlingData, NextPageRequest } from './types.js';
 
 export const getNumberFromMixedString = async (page: Page, selector: string): Promise<number> => {
     const onlyNumericalValue = await page.evaluate((selector) => document.querySelector(selector)?.innerHTML.replace(/[^0-9.]/g, ''), selector);
@@ -79,49 +79,3 @@ export const getJobsCountByCrawlingThroughConsequentPages = async (page:Page, cr
     }
     return newJobsCount;
 };
-
-// export const getJobsCountByCrawlingThroughNumberedPages = async (page:Page, crawlingData:LastPageCrawlingData, crawler:PlaywrightCrawler) => {
-//     const {
-//         domain,
-//         startUrl,
-//         jobsCount,
-//         positionSelector,
-//         paginationItemSelector,
-//     } = crawlingData;
-//
-//     const jobsCountOnCurrentPage = await getNumberBySelectorCount(page, positionSelector);
-//     const newJobsCount = jobsCount ? jobsCount + jobsCountOnCurrentPage : jobsCountOnCurrentPage;
-//
-//     const lastVisiblePageNumber = await page.evaluate((paginationItemSelector) => {
-//         return document.querySelector(`${paginationItemSelector}:last-child a`)?.innerHTML;
-//     }, paginationItemSelector);
-//
-//     const lastPageRequest:LastPageRequest = {
-//         url: `https://jobs.dayforcehcm.com/en-US/ymaryland/CANDIDATEPORTAL?page=${} `,
-//     };
-//     await crawler.addRequests([
-//
-//     ]);
-//     const jobsCountEstimationOnIntermidiatePages = (Number(lastVisiblePageNumber) - 1) * jobsCountOnCurrentPage || 0;
-//
-//     const hrefOfNextPageButton = await getNextPageUrlFromSelector(page, nextButtonSelector);
-//     if (hrefOfNextPageButton) {
-//         const nextPageUrl = domain ? `https://${domain}${hrefOfNextPageButton}` : hrefOfNextPageButton;
-//
-//         const nextPageRequest:NextPageRequest = {
-//             url: nextPageUrl,
-//             label: REQUEST_LABELS.NEXT,
-//             userData: {
-//                 domain,
-//                 startUrl,
-//                 jobsCount: newJobsCount,
-//                 positionSelector,
-//                 nextButtonSelector,
-//             },
-//         };
-//
-//         await crawler.addRequests([nextPageRequest]);
-//         return;
-//     }
-//     return newJobsCount;
-// };

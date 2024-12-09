@@ -224,12 +224,14 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Based on selectors count.';
     }
 
-    if (/dayforcehcm/.test(domain)) {
-        const maxJobsCountPerPage = await page.locator('.ant-list-item').count();
+    if (/jobs.dayforcehcm/.test(domain)) {
+        const positionSelector = '.ant-list-item';
+        const paginationItemSelector = '.ant-pagination-item';
 
-        const lastPageNumber = await page.locator('.ant-pagination-item').last().getAttribute('title'); // last page button
+        const maxJobsCountPerPage = await page.locator(positionSelector).count();
+        const lastPageNumber = Number(await page.locator(paginationItemSelector).last().innerText()); // last page button
 
-        if (lastPageNumber) {
+        if (lastPageNumber && lastPageNumber > 1) {
             const lastPageUrl = new URL(`${url}?page=${lastPageNumber}`);
 
             await crawler.addRequests([
@@ -246,17 +248,35 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
             ]);
             return;
         }
-        // await lastPageLocator.highlight();
-        // if (await lastPageLocator.isVisible()) {
-        //     await lastPageLocator.click();
-        // }
-        // await page.waitForSelector('.ant-pagination');
-        // const newLastLocatorTitle = await page.locator('.ant-pagination-item').last().getAttribute('title');
-        // log.info(newLastLocatorTitle);
-        // if (lastPageNumber === newLastLocatorTitle) {
-        //     log.info('same');
-        // }
-        // await sleep(30_000);
+        jobsCount = maxJobsCountPerPage;
+        method = 'Based on selectors count.';
+    }
+    if (/us\d\d\d\.dayforcehcm/.test(domain)) {
+        const positionSelector = '.search-result';
+        const paginationItemSelector = '.pagination li[class]';
+
+        const maxJobsCountPerPage = await page.locator(positionSelector).count();
+        const lastPageNumber = Number(await page.locator(paginationItemSelector).last().innerText()); // last page button
+
+        if (lastPageNumber && lastPageNumber > 1) {
+            const lastPageUrl = new URL(`${url}?page=${lastPageNumber}`);
+
+            await crawler.addRequests([
+                {
+                    url: lastPageUrl.toString(),
+                    label: REQUEST_LABELS.LAST,
+                    userData: {
+                        startUrl: url,
+                        maxJobsCountPerPage,
+                        positionSelector,
+                        paginationItemSelector,
+                    } as LastPageCrawlingData,
+                } as LastPageRequest,
+            ]);
+            return;
+        }
+        jobsCount = maxJobsCountPerPage;
+        method = 'Based on selectors count.';
     }
 
     // if (/myavionte/.test(domain)) {
@@ -280,8 +300,6 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     //             }
     //         }
     //     } playwright problem: element resolved but unclickable
-
-    await sleep(30_000);
     await pushToDataset(url, jobsCount, method);
 });
 
@@ -300,7 +318,7 @@ router.addHandler(REQUEST_LABELS.NEXT, async ({ page, request, crawler }) => {
 router.addHandler(REQUEST_LABELS.LAST, async ({ page, request, crawler }) => {
     const { url, userData } = request;
     const currentPageNumber = Number(new URL(url).searchParams.get('page'));
-    const lastPageNumber = Number(await page.locator(userData.paginationItemSelector).last().getAttribute('title'));
+    const lastPageNumber = Number(await page.locator(userData.paginationItemSelector).last().innerText());
     let jobsCount = null;
 
     // we reached true last page
