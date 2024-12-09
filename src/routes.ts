@@ -95,6 +95,11 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Based on selectors count.';
     }
 
+    if (/msisurfaces/.test(domain)) {
+        jobsCount = await page.locator('.searchPartialContent .col-xs-12').count();
+        method = 'Based on selectors count.';
+    }
+
     if (/automate.org/.test(domain)) {
         const dropDownLocator = page.locator('#zipSearch #field1_1');
         if (dropDownLocator) {
