@@ -217,6 +217,11 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Based on selectors count.';
     }
 
+    if (/dealerflex/.test(domain)) {
+        jobsCount = await page.locator('.single-job').count();
+        method = 'Based on selectors count.';
+    }
+
     if (/dayforcehcm/.test(domain)) {
         const maxJobsCountPerPage = await page.locator('ant-list-item').count();
 
