@@ -19,23 +19,23 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     let jobsCount: number|null = null;
     let method = '';
 
-    if (url.includes('recruiting.ultipro.com')) {
+    if (url.includes('recruiting.ultipro')) {
         await sleep(10_000);
         jobsCount = await getNumberFromMixedString(page, '[data-automation="opportunities-count"]');
         method = 'Found on page.';
     }
 
-    if (url.includes('careers.joveo.com')) {
+    if (url.includes('careers.joveo')) {
         jobsCount = await getNumberFromMixedString(page, 'h6.mui-style-d6f2o4');
         method = 'Found on page.';
     }
 
-    if (url.includes('bawc.com')) {
+    if (url.includes('bawc')) {
         jobsCount = 1;
         method = 'Set manually.';
     }
 
-    if (/epitec.com/.test(domain)) {
+    if (/epitec/.test(domain)) {
         const foundNumber = await getJobsCountByCrawlingThroughConsequentPages(
             page,
             {
@@ -53,25 +53,30 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         jobsCount = foundNumber;
     }
 
-    if (/yorkemployment.com/.test(domain)
-        || /burnettspecialists.com/.test(domain)
-        || /selectek.com/.test(domain)
-        || /dwsimpson.com/.test(domain)
-        || /hhstaffingservices.com/.test(domain)
-        || /intersolutions.com/.test(domain)
+    if (/yorkemployment/.test(domain)
+        || /burnettspecialists/.test(domain)
+        || /selectek/.test(domain)
+        || /dwsimpson/.test(domain)
+        || /hhstaffingservices/.test(domain)
+        || /intersolutions/.test(domain)
     ) {
         await scrollToTheBottom(page);
         jobsCount = await page.locator('.job-post-row').count();
         method = 'Automated loading of whole list by scrolling, count based on selectors count.';
     }
 
-    if (/jobs.jobvite.com/.test(domain)) {
+    if (/jobs.jobvite/.test(domain)) {
         jobsCount = await page.locator('.jv-job-list-name').count();
         method = 'Based on selectors count.';
     }
 
-    if (/edtheory.com/.test(domain)) {
+    if (/edtheory/.test(domain)) {
         jobsCount = await page.locator('.job-details .row').count();
+        method = 'Based on selectors count.';
+    }
+
+    if (/avanceservices/.test(domain)) {
+        jobsCount = await page.locator('.elementor-accordion-item').count();
         method = 'Based on selectors count.';
     }
 
@@ -96,7 +101,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Based on selectors count.';
     }
 
-    if (/stutsmans.com/.test(domain)) {
+    if (/stutsmans/.test(domain)) {
         const frameLocator = page.frameLocator('#gnewtonIframe');
         if (await frameLocator.locator('#gnewtonCareerHome').isVisible({ timeout: 120_000 })) {
             jobsCount = await frameLocator.locator('.gnewtonJobLink')?.count();
@@ -104,24 +109,24 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         }
     }
 
-    if (/oppenheimer.com/.test(domain)) {
+    if (/oppenheimer/.test(domain)) {
         const frameLocator = page.frameLocator('#inlineframe');
         jobsCount = await frameLocator.locator('.jobListItem').count();
         method = 'Based on selectors count.';
     }
 
-    if (/talkspace.com/.test(domain)) {
+    if (/talkspace/.test(domain)) {
         const frameLocator = page.frameLocator('#grnhse_iframe');
         jobsCount = await frameLocator.locator('.opening').count();
         method = 'Based on selectors count.';
     }
 
-    if (/supplyhouse.com/.test(domain)) {
+    if (/supplyhouse/.test(domain)) {
         jobsCount = await page.locator('.pos-item').count();
         method = 'Based on selectors count.';
     }
 
-    if (/ssemploymentpartners.com/.test(domain)) {
+    if (/ssemploymentpartners/.test(domain)) {
         await crawler.addRequests([
             {
                 url: 'https://www2.pcrecruiter.net/pcrbin/jobboard.aspx?uid=ss%20employment%20partners%20.ssemploymentpartners',
@@ -134,7 +139,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         return;
     }
 
-    if (/gtstaffing.com/.test(domain)) {
+    if (/gtstaffing/.test(domain)) {
         await crawler.addRequests([
             {
                 url: 'https://gtstaffing.com/careers/#/jobs',
@@ -147,7 +152,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         return;
     }
 
-    if (url.includes('m-v-t.com')) {
+    if (url.includes('m-v-t')) {
         await page.waitForSelector('.job_listing', { timeout: 60_000 });
         await clickOnLoadMoreButtonWhilePresent(page, '.load_more_jobs');
         await sleep(2_000);
@@ -155,7 +160,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
     }
 
-    if (/velosource.com/.test(domain)) {
+    if (/velosource/.test(domain)) {
         await page.waitForSelector('[role="listitem"]', { timeout: 60_000 });
         await clickOnLoadMoreButtonWhilePresent(page, '[aria-label="Load More"]');
         await sleep(2_000);
@@ -163,7 +168,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
     }
 
-    if (/careeradvancers.com/.test(domain)) {
+    if (/careeradvancers/.test(domain)) {
         await page.waitForSelector('.recruiterwp-jobs-col', { timeout: 60_000 });
         await clickOnLoadMoreButtonWhilePresent(page, '.facetwp-load-more');
         await sleep(2_000);
@@ -171,18 +176,18 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
     }
 
-    if (/monarchlandscape.com/.test(domain)) {
+    if (/monarchlandscape/.test(domain)) {
         const frameLocator = page.frameLocator('#inlineframe');
         jobsCount = await frameLocator.locator('tr.ReqRowClick').count();
         method = 'Based on selectors count.';
     }
 
-    if (/managedlaborsolutions.prismhr-hire.com/.test(domain)) {
+    if (/managedlaborsolutions.prismhr-hire/.test(domain)) {
         jobsCount = await page.locator('.job-container').count();
         method = 'Based on selectors count.';
     }
 
-    if (/dayforcehcm.com/.test(domain)) {
+    if (/dayforcehcm/.test(domain)) {
         const maxJobsCountPerPage = await page.locator('ant-list-item').count();
 
         const lastPageNumber = await page.locator('.ant-pagination-item').last().getAttribute('title'); // last page button
@@ -218,7 +223,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         // await sleep(30_000);
     }
 
-    // if (/myavionte.com/.test(domain)) {
+    // if (/myavionte/.test(domain)) {
     //     const firstPageJobsCount = await page.locator('.jobs-list .job-item').count();
     //     const numberOfPages = await page.locator('.paging-item').count();
     //     if (!numberOfPages || numberOfPages === 1) {
