@@ -59,6 +59,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         || /dwsimpson/.test(domain)
         || /hhstaffingservices/.test(domain)
         || /intersolutions/.test(domain)
+        || /theseergroup/.test(domain)
     ) {
         await scrollToTheBottom(page);
         jobsCount = await page.locator('.job-post-row').count();
