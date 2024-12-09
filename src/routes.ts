@@ -54,7 +54,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         jobsCount = foundNumber;
     }
 
-    if (/yorkemployment.com/.test(domain) || /burnettspecialists.com/.test(domain) || /selectek.com/.test(domain) || /dwsimpson.com/.test(domain)) {
+    if (/yorkemployment.com/.test(domain) || /burnettspecialists.com/.test(domain) || /selectek.com/.test(domain) || /dwsimpson.com/.test(domain) || /hhstaffingservices.com/.test(domain)) {
         await scrollToTheBottom(page);
         jobsCount = await getNumberBySelectorCount(page, '.job-post-row');
         method = 'Automated loading of whole list by scrolling, count based on selectors count.';
