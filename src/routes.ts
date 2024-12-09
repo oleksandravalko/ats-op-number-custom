@@ -3,7 +3,6 @@ import { REQUEST_LABELS } from './contstants.js';
 import {
     clickOnLoadMoreButtonWhilePresent,
     getJobsCountByCrawlingThroughConsequentPages,
-    getNumberBySelectorCount,
     getNumberFromMixedString,
     pushToDataset,
     scrollToTheBottom,
@@ -62,12 +61,33 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         || /intersolutions.com/.test(domain)
     ) {
         await scrollToTheBottom(page);
-        jobsCount = await getNumberBySelectorCount(page, '.job-post-row');
+        jobsCount = await page.locator('.job-post-row').count();
         method = 'Automated loading of whole list by scrolling, count based on selectors count.';
     }
 
-    if (url.includes('jobs.jobvite.com')) {
-        jobsCount = await getNumberBySelectorCount(page, '.jv-job-list-name');
+    if (/jobs.jobvite.com/.test(domain)) {
+        jobsCount = await page.locator('.jv-job-list-name').count();
+        method = 'Based on selectors count.';
+    }
+
+    if (/automate.org/.test(domain)) {
+        const dropDownLocator = page.locator('#zipSearch #field1_1');
+        if (dropDownLocator) {
+            await dropDownLocator.selectOption({ value: '1' });
+        }
+
+        const includeRemoteCheckbox = page.locator('#includeRemote');
+        if (includeRemoteCheckbox) {
+            await includeRemoteCheckbox.check();
+        }
+
+        const goButton = page.locator('.gridcol.three button.newsSearch').filter({ hasText: 'GO' });
+        if (goButton) {
+            await goButton.click();
+        }
+        await sleep(2_000);
+
+        jobsCount = await page.locator('.job-opening').count();
         method = 'Based on selectors count.';
     }
 
@@ -92,7 +112,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     }
 
     if (/supplyhouse.com/.test(domain)) {
-        jobsCount = await getNumberBySelectorCount(page, '.pos-item');
+        jobsCount = await page.locator('.pos-item').count();
         method = 'Based on selectors count.';
     }
 
@@ -126,7 +146,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await page.waitForSelector('.job_listing', { timeout: 60_000 });
         await clickOnLoadMoreButtonWhilePresent(page, '.load_more_jobs');
         await sleep(2_000);
-        jobsCount = await getNumberBySelectorCount(page, '.job_listing');
+        jobsCount = await page.locator('.job_listing').count();
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
     }
 
@@ -134,7 +154,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await page.waitForSelector('[role="listitem"]', { timeout: 60_000 });
         await clickOnLoadMoreButtonWhilePresent(page, '[aria-label="Load More"]');
         await sleep(2_000);
-        jobsCount = await getNumberBySelectorCount(page, '[role="listitem"]');
+        jobsCount = await page.locator('[role="listitem"]').count();
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
     }
 
@@ -142,7 +162,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await page.waitForSelector('.recruiterwp-jobs-col', { timeout: 60_000 });
         await clickOnLoadMoreButtonWhilePresent(page, '.facetwp-load-more');
         await sleep(2_000);
-        jobsCount = await getNumberBySelectorCount(page, '.job-listing-item');
+        jobsCount = await page.locator('.job-listing-item').count();
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
     }
 
@@ -158,7 +178,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     }
 
     if (/dayforcehcm.com/.test(domain)) {
-        const maxJobsCountPerPage = await getNumberBySelectorCount(page, 'ant-list-item');
+        const maxJobsCountPerPage = await page.locator('ant-list-item').count();
 
         const lastPageNumber = await page.locator('.ant-pagination-item').last().getAttribute('title'); // last page button
 
@@ -238,7 +258,7 @@ router.addHandler(REQUEST_LABELS.LAST, async ({ page, request }) => {
     let jobsCount = null;
 
     if (currentPageNumber && currentPageNumber === lastPageNumber) {
-        const jobsCountOnCurrentPage = await getNumberBySelectorCount(page, 'positionSelector');
+        const jobsCountOnCurrentPage = await page.locator('positionSelector').count();
         const jobsCountOnPreviousPages = userData.maxJobsCountPerPage * (currentPageNumber - 1);
         jobsCount = jobsCountOnCurrentPage + jobsCountOnPreviousPages;
     }
@@ -262,7 +282,7 @@ router.addHandler(REQUEST_LABELS.ALTERNATIVE, async ({ page, request }) => {
         await page.waitForSelector('.job-list', { timeout: 60_000 });
         await clickOnLoadMoreButtonWhilePresent(page, '.load-more-data');
         await sleep(2_000);
-        jobsCount = await getNumberBySelectorCount(page, '.slide-up-item');
+        jobsCount = await page.locator('.slide-up-item').count();
         method += ' Automated loading of whole list by button clicks, count based on selectors count.';
     }
 

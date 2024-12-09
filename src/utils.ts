@@ -8,10 +8,6 @@ export const getNumberFromMixedString = async (page: Page, selector: string): Pr
     return Number(onlyNumericalValue) || 0;
 };
 
-export const getNumberBySelectorCount = async (page:Page, selector: string): Promise<number> => {
-    return await page.evaluate((selector) => document.querySelectorAll(selector)?.length, selector);
-};
-
 export const scrollToTheBottom = async (page:Page) => {
     const currentHeight = await page.evaluate(() => {
         const startingHeight = document.body.scrollHeight;
@@ -59,7 +55,7 @@ export const getJobsCountByCrawlingThroughConsequentPages = async (page:Page, cr
         nextButtonSelector,
     } = crawlingData;
 
-    const jobsCountOnCurrentPage = Number(await getNumberBySelectorCount(page, positionSelector));
+    const jobsCountOnCurrentPage = Number(await page.locator(positionSelector).count());
     const newJobsCount = jobsCount ? jobsCount + jobsCountOnCurrentPage : jobsCountOnCurrentPage;
 
     const hrefOfNextPageButton = await getNextPageUrlFromSelector(page, nextButtonSelector);
