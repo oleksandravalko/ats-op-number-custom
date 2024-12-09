@@ -18,7 +18,7 @@ export const scrollToTheBottom = async (page:Page) => {
         window.scrollTo(0, startingHeight);
         return startingHeight;
     });
-    await sleep(3_000);
+    await sleep(4_000);
     const newHeight = await page.evaluate(() => document.body.scrollHeight);
     if (newHeight > currentHeight) {
         await scrollToTheBottom(page);

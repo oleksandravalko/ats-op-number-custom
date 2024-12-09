@@ -24,19 +24,16 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await sleep(10_000);
         jobsCount = await getNumberFromMixedString(page, '[data-automation="opportunities-count"]');
         method = 'Found on page.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (url.includes('careers.joveo.com')) {
         jobsCount = await getNumberFromMixedString(page, 'h6.mui-style-d6f2o4');
         method = 'Found on page.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (url.includes('bawc.com')) {
         jobsCount = 1;
         method = 'Set manually.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (/epitec.com/.test(domain)) {
@@ -53,20 +50,19 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         if (!foundNumber) {
             return;
         }
-        await pushToDataset(url, foundNumber, 'Crawled through consequent pages counting positions.');
+        method = 'Crawled through consequent pages counting positions.';
+        jobsCount = foundNumber;
     }
 
     if (/yorkemployment.com/.test(domain) || /burnettspecialists.com/.test(domain) || /selectek.com/.test(domain) || /dwsimpson.com/.test(domain)) {
         await scrollToTheBottom(page);
         jobsCount = await getNumberBySelectorCount(page, '.job-post-row');
         method = 'Automated loading of whole list by scrolling, count based on selectors count.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (url.includes('jobs.jobvite.com')) {
         jobsCount = await getNumberBySelectorCount(page, '.jv-job-list-name');
         method = 'Based on selectors count.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (/stutsmans.com/.test(domain)) {
@@ -75,27 +71,23 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
             jobsCount = await frameLocator.locator('.gnewtonJobLink')?.count();
             method = 'Based on selectors count.';
         }
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (/oppenheimer.com/.test(domain)) {
         const frameLocator = page.frameLocator('#inlineframe');
         jobsCount = await frameLocator.locator('.jobListItem').count();
         method = 'Based on selectors count.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (/talkspace.com/.test(domain)) {
         const frameLocator = page.frameLocator('#grnhse_iframe');
         jobsCount = await frameLocator.locator('.opening').count();
         method = 'Based on selectors count.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (/supplyhouse.com/.test(domain)) {
         jobsCount = await getNumberBySelectorCount(page, '.pos-item');
         method = 'Based on selectors count.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (/ssemploymentpartners.com/.test(domain)) {
@@ -108,6 +100,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
                 },
             },
         ]);
+        return;
     }
 
     if (/gtstaffing.com/.test(domain)) {
@@ -120,6 +113,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
                 },
             },
         ]);
+        return;
     }
 
     if (url.includes('m-v-t.com')) {
@@ -128,7 +122,6 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await sleep(2_000);
         jobsCount = await getNumberBySelectorCount(page, '.job_listing');
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (/velosource.com/.test(domain)) {
@@ -137,7 +130,6 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await sleep(2_000);
         jobsCount = await getNumberBySelectorCount(page, '[role="listitem"]');
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
-        await pushToDataset(url, jobsCount, method);
     }
 
     if (/careeradvancers.com/.test(domain)) {
@@ -146,7 +138,17 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await sleep(2_000);
         jobsCount = await getNumberBySelectorCount(page, '.job-listing-item');
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
-        await pushToDataset(url, jobsCount, method);
+    }
+
+    if (/monarchlandscape.com/.test(domain)) {
+        const frameLocator = page.frameLocator('#inlineframe');
+        jobsCount = await frameLocator.locator('tr.ReqRowClick').count();
+        method = 'Based on selectors count.';
+    }
+
+    if (/managedlaborsolutions.prismhr-hire.com/.test(domain)) {
+        jobsCount = await page.locator('.job-container').count();
+        method = 'Based on selectors count.';
     }
 
     if (/dayforcehcm.com/.test(domain)) {
@@ -184,6 +186,31 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         // }
         // await sleep(30_000);
     }
+
+    // if (/myavionte.com/.test(domain)) {
+    //     const firstPageJobsCount = await page.locator('.jobs-list .job-item').count();
+    //     const numberOfPages = await page.locator('.paging-item').count();
+    //     if (!numberOfPages || numberOfPages === 1) {
+    //         jobsCount = firstPageJobsCount;
+    //     }
+    //
+    //     if (numberOfPages > 1) {
+    //         const lastPageButtonLocator = page.locator('.paging-item').last();
+    //         await lastPageButtonLocator.scrollIntoViewIfNeeded();
+    //
+    //         await lastPageButtonLocator.click();
+    //         await sleep(2_000);
+    //         if ((await lastPageButtonLocator.getAttribute('class'))?.includes('.paging-item-active')) {
+    //             const lastPageJobsCount = await page.locator('.jobs-list .job-item').count();
+    //             log.info(lastPageJobsCount.toString());
+    //             if (lastPageJobsCount) {
+    //                 jobsCount = firstPageJobsCount * (numberOfPages - 1);
+    //             }
+    //         }
+    //     } playwright problem: element resolved but unclickable
+
+    await sleep(30_000);
+    await pushToDataset(url, jobsCount, method);
 });
 
 router.addHandler(REQUEST_LABELS.NEXT, async ({ page, request, crawler }) => {
@@ -222,6 +249,7 @@ router.addHandler(REQUEST_LABELS.ALTERNATIVE, async ({ page, request }) => {
             return document.querySelector('#resultcount')?.innerHTML.split('of')[1].replace(/\s/g, ''); // e.g. "1-12 of 13"
         });
         jobsCount = Number(foundNumber);
+        method += ' Automated loading of whole list by button clicks, count based on selectors count.';
     }
 
     if (/gtstaffing/.test(url)) {
