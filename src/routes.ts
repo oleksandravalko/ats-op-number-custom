@@ -225,17 +225,16 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     }
 
     if (/dayforcehcm/.test(domain)) {
-        const maxJobsCountPerPage = await page.locator('ant-list-item').count();
+        const maxJobsCountPerPage = await page.locator('.ant-list-item').count();
 
         const lastPageNumber = await page.locator('.ant-pagination-item').last().getAttribute('title'); // last page button
 
         if (lastPageNumber) {
-            const lastPageParsedUrl = { ...parsedUrl };
-            lastPageParsedUrl.searchParams.set('page', lastPageNumber);
+            const lastPageUrl = new URL(`${url}?page=${lastPageNumber}`);
 
             await crawler.addRequests([
                 {
-                    url: lastPageParsedUrl.toString(),
+                    url: lastPageUrl.toString(),
                     label: REQUEST_LABELS.LAST,
                     userData: {
                         startUrl: url,
@@ -245,7 +244,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
                     } as LastPageCrawlingData,
                 } as LastPageRequest,
             ]);
-            log.info(lastPageNumber);
+            return;
         }
         // await lastPageLocator.highlight();
         // if (await lastPageLocator.isVisible()) {
@@ -298,18 +297,29 @@ router.addHandler(REQUEST_LABELS.NEXT, async ({ page, request, crawler }) => {
     await pushToDataset(request.userData.startUrl, jobsCount, 'Crawled through consequent pages counting positions.');
 });
 
-router.addHandler(REQUEST_LABELS.LAST, async ({ page, request }) => {
+router.addHandler(REQUEST_LABELS.LAST, async ({ page, request, crawler }) => {
     const { url, userData } = request;
     const currentPageNumber = Number(new URL(url).searchParams.get('page'));
     const lastPageNumber = Number(await page.locator(userData.paginationItemSelector).last().getAttribute('title'));
     let jobsCount = null;
 
+    // we reached true last page
     if (currentPageNumber && currentPageNumber === lastPageNumber) {
-        const jobsCountOnCurrentPage = await page.locator('positionSelector').count();
+        const jobsCountOnCurrentPage = await page.locator(userData.positionSelector).count();
         const jobsCountOnPreviousPages = userData.maxJobsCountPerPage * (currentPageNumber - 1);
         jobsCount = jobsCountOnCurrentPage + jobsCountOnPreviousPages;
+        await pushToDataset(userData.startUrl, jobsCount, 'Jumped to the last page and calculated jobs.');
+        return;
     }
-    if (typeof jobsCount !== 'undefined') await pushToDataset(userData.startUrl, jobsCount, 'Jumped to the last page and calculated jobs.');
+    // we have continuation of search
+    const newLastPageUrl = new URL(`${url}?page=${lastPageNumber}`);
+    await crawler.addRequests([
+        {
+            url: newLastPageUrl.toString(),
+            label: REQUEST_LABELS.LAST,
+            userData,
+        } as LastPageRequest,
+    ]);
 });
 
 router.addHandler(REQUEST_LABELS.ALTERNATIVE, async ({ page, request }) => {
