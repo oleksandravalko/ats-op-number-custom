@@ -129,6 +129,11 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Based on selectors count.';
     }
 
+    if (/leisurecare/.test(domain)) {
+        jobsCount = await page.locator('.jobaline-job').count();
+        method = 'Based on selectors count.';
+    }
+
     if (/myjobs.adp/.test(domain)) {
         await crawler.addRequests([
             {
@@ -236,6 +241,11 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await sleep(2_000);
         jobsCount = await page.locator('[role="listitem"]').count();
         method = 'Automated loading of whole list by button clicks, count based on selectors count.';
+    }
+
+    if (/hawxpestcontrol/.test(domain)) {
+        jobsCount = await page.locator('.careers-job-list-data').count();
+        method = 'Based on selectors count.';
     }
 
     if (/careeradvancers/.test(domain)) {
