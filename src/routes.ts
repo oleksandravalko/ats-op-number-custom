@@ -1,4 +1,4 @@
-import { createPlaywrightRouter, log, sleep } from 'crawlee';
+import { createPlaywrightRouter, log, sleep, KeyValueStore } from 'crawlee';
 import { REQUEST_LABELS } from './contstants.js';
 import {
     clickOnLoadMoreButtonWhilePresent,
@@ -101,7 +101,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await page.waitForSelector('#resultsareaID');
         await scrollToTheBottom(page);
         jobsCount = await page.locator('.job-row').count();
-        method = 'Based on selectors count.';
+        method = 'BAutomated loading of whole list by scrolling, count based on selectors count.';
     }
 
     if (/oklahomadepartmentofhumanservices/.test(domain)) {
@@ -322,7 +322,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         const pageKey = 'pr';
 
         const frameLocator = page.frameLocator(iframeSelector);
-        await page.waitForSelector(positionSelector, { timeout: 90_000 });
+        await KeyValueStore.setValue('scr1', await page.screenshot(), { contentType: 'image/png' });
         const maxJobsCountPerPage = await frameLocator.locator(positionSelector).count();
         const lastPageNumber = await getNumberBySelector(frameLocator, lastPageButtonSelector); // tricky, last page number is in hidden text on button
 
