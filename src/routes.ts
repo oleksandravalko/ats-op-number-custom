@@ -35,6 +35,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Found on page.';
     }
     if (/alliedonesource/.test(domain)) {
+        await page.waitForSelector('.shmResultCount');
         jobsCount = await getNumberFromMixedString(page, '.shmResultCount');
         method = 'Found on page.';
     }
@@ -130,6 +131,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     }
 
     if (/leisurecare/.test(domain)) {
+        await page.waitForSelector('.jobaline-job');
         jobsCount = await page.locator('.jobaline-job').count();
         method = 'Based on selectors count.';
     }
@@ -294,7 +296,8 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         const pageKey = 'page';
 
         const maxJobsCountPerPage = await page.locator(positionSelector).count();
-        const lastPageNumber = Number(await page.locator(lastPageButtonSelector).last().innerText()); // last page button
+        await page.waitForSelector('.ant-pagination', { timeout: 120_000 });
+        const lastPageNumber = Number(await page.locator(lastPageButtonSelector).last().innerText());
 
         if (lastPageNumber && lastPageNumber > 1) {
             const lastPageUrl = `${url}?${pageKey}=${lastPageNumber}`;
@@ -460,7 +463,7 @@ router.addHandler(REQUEST_LABELS.ALTERNATIVE, async ({ page, request }) => {
     }
 
     if (/myjobs.adp/.test(url)) {
-        await page.waitForSelector('.left-panel', { timeout: 90_000 });
+        await page.waitForSelector('.left-panel', { timeout: 120_000 });
         const foundNumber = await page.evaluate(() => {
             return document.querySelector('.results-count-label-web span:first-child')?.innerHTML.replace(/\D/g, '');
         });
