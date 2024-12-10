@@ -105,13 +105,13 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await page.waitForSelector('#resultsareaID');
         await scrollToTheBottom(page);
         jobsCount = await page.locator('.job-row').count();
-        method = 'BAutomated loading of whole list by scrolling, count based on selectors count.';
+        method = 'Automated loading of whole list by scrolling, count based on selectors count.';
     }
 
     if (/atrinternational/.test(domain)) {
         await scrollToTheBottom(page);
         jobsCount = await page.locator('.MuiButtonBase-root').count();
-        method = 'BAutomated loading of whole list by scrolling, count based on selectors count.';
+        method = 'Automated loading of whole list by scrolling, count based on selectors count.';
     }
 
     if (/oklahomadepartmentofhumanservices/.test(domain)) {
@@ -127,6 +127,19 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     if (/allegiancestaffing/.test(domain)) {
         jobsCount = await page.locator('a[x-text="job.title"]').count();
         method = 'Based on selectors count.';
+    }
+
+    if (/myjobs.adp/.test(domain)) {
+        await crawler.addRequests([
+            {
+                url: 'https://myjobs.adp.com/cenveo/cx/job-listing',
+                label: REQUEST_LABELS.ALTERNATIVE,
+                userData: {
+                    startUrl: url,
+                },
+            },
+        ]);
+        return;
     }
 
     if (/automate.org/.test(domain)) {
@@ -434,6 +447,15 @@ router.addHandler(REQUEST_LABELS.ALTERNATIVE, async ({ page, request }) => {
         await sleep(2_000);
         jobsCount = await page.locator('.slide-up-item').count();
         method += ' Automated loading of whole list by button clicks, count based on selectors count.';
+    }
+
+    if (/myjobs.adp/.test(url)) {
+        await page.waitForSelector('.left-panel', { timeout: 90_000 });
+        const foundNumber = await page.evaluate(() => {
+            return document.querySelector('.results-count-label-web span:first-child')?.innerHTML.replace(/\D/g, '');
+        });
+        jobsCount = Number(foundNumber);
+        method = 'Found on page.';
     }
 
     await pushToDataset(userData.startUrl, jobsCount, method);
