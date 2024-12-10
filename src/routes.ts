@@ -34,6 +34,10 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         jobsCount = await getNumberFromMixedString(page, 'h6.mui-style-d6f2o4');
         method = 'Found on page.';
     }
+    if (/alliedonesource/.test(domain)) {
+        jobsCount = await getNumberFromMixedString(page, '.shmResultCount');
+        method = 'Found on page.';
+    }
 
     if (url.includes('bawc')) {
         jobsCount = 1;
@@ -101,6 +105,12 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         await page.waitForSelector('#resultsareaID');
         await scrollToTheBottom(page);
         jobsCount = await page.locator('.job-row').count();
+        method = 'BAutomated loading of whole list by scrolling, count based on selectors count.';
+    }
+
+    if (/atrinternational/.test(domain)) {
+        await scrollToTheBottom(page);
+        jobsCount = await page.locator('.MuiButtonBase-root').count();
         method = 'BAutomated loading of whole list by scrolling, count based on selectors count.';
     }
 
