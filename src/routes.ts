@@ -208,7 +208,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     }
 
     if (/velosource/.test(domain)) {
-        await page.waitForSelector('[role="listitem"]', { timeout: 60_000 });
+        await page.waitForSelector('[role="listitem"]', { timeout: 120_000 });
         await clickOnLoadMoreButtonWhilePresent(page, '[aria-label="Load More"]');
         await sleep(2_000);
         jobsCount = await page.locator('[role="listitem"]').count();
@@ -318,7 +318,6 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     if (/icims/.test(domain)) {
         const positionSelector = '.iCIMS_JobsTable .row';
         const lastPageButtonSelector = '.iCIMS_PagingBatch a:last-child .sr-only:nth-child(2)';
-        // const currentPageButtonSelector = '.iCIMS_PagingBatch a.selected :not(.sr-only)';
         const iframeSelector = '#icims_content_iframe';
         const pageKey = 'pr';
 
