@@ -22,13 +22,13 @@ const crawler = new PlaywrightCrawler({
     headless: false,
     navigationTimeoutSecs: 180,
     requestHandlerTimeoutSecs: 180,
-    preNavigationHooks: [
-        async (gotoOptions) => {
-            if (gotoOptions) {
-                gotoOptions.waitUntil = 'load';
-            }
-        },
-    ],
+    // preNavigationHooks: [
+    //     async (gotoOptions) => {
+    //         if (gotoOptions) {
+    //             gotoOptions.waitUntil = 'load';
+    //         }
+    //     },
+    // ],
     requestHandler: router,
     errorHandler: async ({ session }) => {
         session?.retire();

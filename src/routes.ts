@@ -19,6 +19,11 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
     let jobsCount: number|null = null;
     let method = '';
 
+    await Promise.race([
+        page.waitForLoadState('networkidle', { timeout: 120_000 }),
+        sleep(50_000),
+    ]);
+
     if (url.includes('recruiting.ultipro')) {
         await sleep(10_000);
         jobsCount = await getNumberFromMixedString(page, '[data-automation="opportunities-count"]');
@@ -92,6 +97,13 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Based on selectors count.';
     }
 
+    if (/cfstaffing/.test(domain)) {
+        await page.waitForSelector('#resultsareaID');
+        await scrollToTheBottom(page);
+        jobsCount = await page.locator('.job-row').count();
+        method = 'Based on selectors count.';
+    }
+
     if (/oklahomadepartmentofhumanservices/.test(domain)) {
         jobsCount = await page.locator('.list-group-item').count();
         method = 'Based on selectors count.';
@@ -99,6 +111,11 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
 
     if (/msisurfaces/.test(domain)) {
         jobsCount = await page.locator('.searchPartialContent .col-xs-12').count();
+        method = 'Based on selectors count.';
+    }
+
+    if (/allegiancestaffing/.test(domain)) {
+        jobsCount = await page.locator('a[x-text="job.title"]').count();
         method = 'Based on selectors count.';
     }
 
@@ -127,6 +144,14 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         const frameLocator = page.frameLocator('#gnewtonIframe');
         if (await frameLocator.locator('#gnewtonCareerHome').isVisible({ timeout: 120_000 })) {
             jobsCount = await frameLocator.locator('.gnewtonJobLink')?.count();
+            method = 'Based on selectors count.';
+        }
+    }
+
+    if (/jacobyandmeyers/.test(domain)) {
+        const frameLocator = page.frameLocator('#jv_careersite_iframe_id');
+        if (await frameLocator.locator('.jv-page-content').isVisible({ timeout: 120_000 })) {
+            jobsCount = await frameLocator.locator('.jv-job-list-name')?.count();
             method = 'Based on selectors count.';
         }
     }
@@ -224,6 +249,12 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         method = 'Based on selectors count.';
     }
 
+    if (/backyardproducts/.test(domain)) {
+        const frameLocator = page.frameLocator('#gnewtonIframe');
+        jobsCount = await frameLocator.locator('.gnewtonCareerGroupRowClass').count();
+        method = 'Based on selectors count.';
+    }
+
     if (/jobs.dayforcehcm/.test(domain)) {
         const positionSelector = '.ant-list-item';
         const lastPageButtonSelector = '.ant-pagination-item';
@@ -290,11 +321,6 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         // const currentPageButtonSelector = '.iCIMS_PagingBatch a.selected :not(.sr-only)';
         const iframeSelector = '#icims_content_iframe';
         const pageKey = 'pr';
-
-        await Promise.race([
-            page.waitForLoadState('networkidle', { timeout: 120_000 }),
-            sleep(50_000),
-        ]);
 
         const frameLocator = page.frameLocator(iframeSelector);
         const maxJobsCountPerPage = await frameLocator.locator(positionSelector).count();
