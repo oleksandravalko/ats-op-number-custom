@@ -322,6 +322,7 @@ router.addHandler(REQUEST_LABELS.START, async ({ crawler, page, request }) => {
         const pageKey = 'pr';
 
         const frameLocator = page.frameLocator(iframeSelector);
+        await page.waitForSelector(positionSelector, { timeout: 90_000 });
         const maxJobsCountPerPage = await frameLocator.locator(positionSelector).count();
         const lastPageNumber = await getNumberBySelector(frameLocator, lastPageButtonSelector); // tricky, last page number is in hidden text on button
 
