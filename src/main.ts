@@ -1,5 +1,5 @@
 import { Actor } from 'apify';
-import { PlaywrightCrawler } from 'crawlee';
+import { PlaywrightCrawler, sleep } from 'crawlee';
 import { router } from './routes.js';
 import { REQUEST_LABELS } from './contstants.js';
 import { Input, Request } from './types.js';
@@ -21,10 +21,14 @@ const crawler = new PlaywrightCrawler({
     proxyConfiguration,
     headless: false,
     navigationTimeoutSecs: 180,
-    requestHandlerTimeoutSecs: 999999,
-    preNavigationHooks: [async (_, gotoOptions) => {
-        gotoOptions!.waitUntil = 'networkidle';
-    }],
+    requestHandlerTimeoutSecs: 180,
+    preNavigationHooks: [
+        async (gotoOptions) => {
+            if (gotoOptions) {
+                gotoOptions.waitUntil = 'load';
+            }
+        },
+    ],
     requestHandler: router,
     errorHandler: async ({ session }) => {
         session?.retire();

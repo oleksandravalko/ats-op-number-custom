@@ -20,10 +20,10 @@ export type NextPageRequest = {
 
 export type NextPageCrawlingData = {
     domain?: string;
-    startUrl: string;
     jobsCount?: number;
-    positionSelector: string;
     nextButtonSelector: string;
+    positionSelector: string;
+    startUrl: string;
 }
 
 export type LastPageRequest = {
@@ -33,8 +33,10 @@ export type LastPageRequest = {
 };
 
 export type LastPageCrawlingData = {
-    startUrl: string,
+    iframeSelector?: string,
     maxJobsCountPerPage: number,
+    pageKey: string,
+    lastPageButtonSelector: string,
     positionSelector: string
-    paginationItemSelector: string,
+    startUrl: string,
 }

@@ -1,4 +1,4 @@
-import { Page } from 'playwright';
+import { FrameLocator, Page } from 'playwright';
 import { Dataset, PlaywrightCrawler, sleep } from 'crawlee';
 import { REQUEST_LABELS } from './contstants.js';
 import { type LastPageCrawlingData, type LastPageRequest, NextPageCrawlingData, NextPageRequest } from './types.js';
@@ -36,6 +36,10 @@ export const clickOnLoadMoreButtonWhilePresent = async (page:Page, buttonSelecto
 
 export const getNextPageUrlFromSelector = async (page:Page, selector:string) => {
     return await page.evaluate((selector) => document.querySelector(selector)?.getAttribute('href'), selector);
+};
+
+export const getNumberBySelector = async (page:Page | FrameLocator, selector:string) => {
+    return Number((await page.locator(selector).last().textContent())?.replace(/\D/g, ''));
 };
 
 export const pushToDataset = async (url: string, number:number|null, method:string) => {
